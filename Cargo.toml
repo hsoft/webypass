@@ -1,0 +1,7 @@
+[package]
+name = "webypass"
+version = "0.1.0"
+authors = ["Virgil Dupras <hsoft@hardcoded.net>"]
+
+[dependencies]
+hyper = "0.9"
