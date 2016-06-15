@@ -34,6 +34,25 @@ very interactive. If our goal is to properly present it in w3m, this simplifies 
 
 But then, I don't know yet. I want to try.
 
+## Usage
+
+After you've compiled with cargo, simply run `webypass` without argument. It's going to listen
+on `127.0.0.1:8080`.
+
+Then, in your browser, open `http://localhost:8080/?url=http://www.example.com`. You're going
+to get your web page returned. For now, it's returned as is. Pretty useless hey?
+
+Any other request type will yield a `404`.
+
+### What about proxying?
+
+Proxying, that is, setting the "proxy" settings of your browser to `http://localhost:8080`, can't
+work with HTTPS. This type of proxying can't properly do a TLS handshake, with reason: the goal
+of SSL is to ensure that there's no eavesdropping and/or content alteration. Unfortunately, that's
+precisely what this application does.
+
+So no, it's got to be that way.
+
 [w3m]: http://w3m.sourceforge.net/
 [midori]: http://midori-browser.org/
 [hyper]: https://github.com/hyperium/hyper
