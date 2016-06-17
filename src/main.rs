@@ -1,24 +1,37 @@
+extern crate hyper;
+extern crate kuchiki;
+extern crate liquid;
+
+mod fixdom;
+
 use std::io::{Read, Write};
+use std::str;
 
 use hyper::Url;
 use hyper::uri:: RequestUri;
-use hyper::header::Headers;
+use hyper::header::{Headers, AcceptEncoding};
 use hyper::client::Client;
 use hyper::server::{Server, Request, Response};
 
-extern crate hyper;
+use fixdom::fixdom;
 
 fn proxy(req: Request, mut res: Response, target_url: &str) {
     let client = Client::new();
-    let mut proxied_res = client.request(req.method, target_url).headers(req.headers).send().unwrap();
+    let mut req_headers = req.headers.clone();
+    req_headers.remove::<AcceptEncoding>();
+    println!("debug {:?}", &req_headers);
+    let mut proxied_res = client.request(req.method, target_url).headers(req_headers).send().unwrap();
     let mut buffer = Vec::new();
     let _ = proxied_res.read_to_end(&mut buffer);
     {
         let h: &mut Headers = res.headers_mut();
         *h = proxied_res.headers.clone();
+        println!("debug {:?}", &h);
     }
     let mut res = res.start().unwrap();
-    res.write_all(&buffer).unwrap();
+    println!("debug {}", buffer.len());
+    let fixed = fixdom(str::from_utf8(&buffer).unwrap());
+    res.write_all(&fixed.as_bytes()).unwrap();
 }
 
 fn get_url_in_query(url: &Url) -> Option<String> {
