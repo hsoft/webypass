@@ -3,6 +3,7 @@ extern crate kuchiki;
 extern crate liquid;
 
 mod fixdom;
+mod reddit;
 
 use std::io::{Read, Write};
 use std::str;
@@ -30,8 +31,10 @@ fn proxy(req: Request, mut res: Response, target_url: &str) {
     }
     let mut res = res.start().unwrap();
     println!("debug {}", buffer.len());
-    let fixed = fixdom(str::from_utf8(&buffer).unwrap());
-    res.write_all(&fixed.as_bytes()).unwrap();
+    match fixdom(&Url::parse(target_url).unwrap(), str::from_utf8(&buffer).unwrap()) {
+        Some(fixed) => res.write_all(&fixed.as_bytes()).unwrap(),
+        None => res.write_all(&buffer).unwrap(),
+    };
 }
 
 fn get_url_in_query(url: &Url) -> Option<String> {
