@@ -1,14 +1,12 @@
 use std::collections::HashMap;
 
-use kuchiki;
-use kuchiki::traits::*;
+use kuchiki::NodeRef;
 use liquid;
 use liquid::{Renderable, Context, Value};
 
-pub fn fix(html: &str) -> String {
-    let doc = kuchiki::parse_html().one(html);
+pub fn fix(document: &NodeRef) -> String {
     let mut links: Vec<Value> = Vec::new();
-    let matches = doc.select("div.thing a.title").unwrap();
+    let matches = document.select("div.thing a.title").unwrap();
 
     for css_match in matches {
         let mut link: HashMap<String, Value> = HashMap::new();
